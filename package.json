@@ -20,6 +20,7 @@
   "dependencies": {
     "better-npm-run": "0.0.13",
     "express": "^4.14.0",
+    "fixed-data-table": "^0.6.3",
     "react": "^15.4.1",
     "react-dom": "^15.4.1"
   },

@@ -7,6 +7,10 @@ const adsMetrics = require('./ads_metrics');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.listen(PORT, () => {
+  console.log(`Listening on port ${PORT}`);
+});
+
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/index.html'));
@@ -24,6 +28,4 @@ app.get('/ads_metrics', (req, res) => {
 });
 
 
-app.listen(PORT, () => {
-  console.log(`Listening on port ${PORT}`);
-});
+

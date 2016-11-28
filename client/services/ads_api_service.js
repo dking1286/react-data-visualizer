@@ -1,44 +1,44 @@
-const API_URL = 'http://localhost:3000';
+export const API_URL = 'http://localhost:3000';
 
-function apiEndpoint(route) {
-  return API_URL + route;
-}
+export const apiEndpoint = route => API_URL + route;
 
+export const validEndpoints = {
+  ads: apiEndpoint('/ads'),
+  ads_metrics: apiEndpoint('/ads_metrics'),
+};
 
-const AdsAPIService = {
-  get: (endpoint) => {
+export const onHttpResponse = (resolve, reject) => (response) => {
+  if (response.status !== 200) {
+    return reject(
+      new Error(`Response status code was ${response.status}, not 200`)
+    );
+  }
+
+  let responseData;
+  try {
+    responseData = JSON.parse(response.responseText);
+    return resolve(responseData);
+  } catch (err) {
+    return reject(err);
+  }
+};
+
+export const onHttpError = (resolve, reject) => (error) => {
+  return reject(error);
+};
+
+export default {
+  get: (endpoint, httpRequest) => {
     return new Promise((resolve, reject) => {
-      const url = AdsAPIService.validEndpoints[endpoint];
+      const url = validEndpoints[endpoint];
 
       if (!url) return reject(new Error('Invalid API endpoint provided'));
 
-      const xhr = new XMLHttpRequest();
-      xhr.onload = AdsAPIService.onHttpResponse(resolve, reject);
-      xhr.onerror = AdsAPIService.onHttpError(resolve, reject);
+      httpRequest.onload = onHttpResponse(resolve, reject);
+      httpRequest.onerror = onHttpError(resolve, reject);
 
-      xhr.open('GET', url);
-      return xhr.send();
+      httpRequest.open('GET', url);
+      return httpRequest.send();
     });
   },
-
-  onHttpResponse: (resolve, reject) => (response) => {
-    let responseData;
-    try {
-      responseData = JSON.parse(response.responseText);
-      return resolve(responseData);
-    } catch (err) {
-      return reject(err);
-    }
-  },
-
-  onHttpError: (resolve, reject) => (event) => {
-
-  },
-
-  validEndpoints: {
-    ads: apiEndpoint('/ads'),
-    ads_metrics: apiEndpoint('/ads_metrics'),
-  },
 };
-
-export default AdsAPIService;

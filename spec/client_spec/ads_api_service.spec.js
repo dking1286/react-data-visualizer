@@ -1,9 +1,9 @@
 /* eslint-disable */
 
-const expect = require('chai').expect;
-const sinon = require('sinon');
+import { expect } from 'chai';
+import sinon from 'sinon';
 
-const AdsAPIService = require('../../client/services/ads_api_service');
+import AdsAPIService from '../../client/services/ads_api_service';
 
 describe('AdsAPIService', function () {
   describe('.onHttpResponse', function () {

@@ -11,5 +11,3 @@ render(
   <App />,
   document.querySelector('#main')
 );
-
-// TODO: Add the default stylesheet for fixed-data-table

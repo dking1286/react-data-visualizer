@@ -5,11 +5,11 @@ import sinon from 'sinon';
 
 import AdsAPIService from '../../client/services/ads_api_service';
 import {
-  apiEndpoint, validEndpoints, onHttpResponse, onHttpError
+  apiEndpoint, validEndpoints, onHttpResponse, onHttpError, getTestable
 } from '../../client/services/ads_api_service';
 
 describe('AdsAPIService', function () {
-  describe('.onHttpResponse', function () {
+  describe('onHttpResponse', function () {
     it('should return a function', function () {
       expect(onHttpResponse()).to.be.a.function;
     });
@@ -67,7 +67,7 @@ describe('AdsAPIService', function () {
     });
   });
 
-  describe('.onHttpError', function () {
+  describe('onHttpError', function () {
     it('should return a function', function () {
       expect(onHttpError()).to.be.a('function');
     });
@@ -93,9 +93,9 @@ describe('AdsAPIService', function () {
     });
   });
 
-  describe('.get', function () {
+  describe('get', function () {
     it('should return a Promise', function () {
-      expect(AdsAPIService.get('blah')).to.be.an.instanceof(Promise);
+      expect(getTestable('blah')).to.be.an.instanceof(Promise);
     });
 
     it('should reject if an invalid endpoint is provided', function (done) {
@@ -103,7 +103,7 @@ describe('AdsAPIService', function () {
 
       expect(validEndpoints).to.not.include.keys(invalid);
 
-      AdsAPIService.get(invalid)
+      getTestable(invalid)
         .then(() => {
           // This shouldn't happen
           return done(new Error('Promise resolved instead of rejected'));
@@ -123,10 +123,10 @@ describe('AdsAPIService', function () {
 
       const url = apiEndpoint('/ads');
       
-      AdsAPIService.get('ads', fakeHTTP);
+      getTestable('ads', fakeHTTP);
 
       expect(fakeHTTP.open.calledWith('GET', url)).to.be.true;
-      expect(fakeHTTP.send.called).to.be.truel
+      expect(fakeHTTP.send.called).to.be.true;
     });
   });
 });

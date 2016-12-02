@@ -5,7 +5,7 @@ import sinon from 'sinon';
 
 import AdsAPIService from '../../client/services/ads_api_service';
 import {
-  apiEndpoint, validEndpoints, onHttpResponse, onHttpError, getTestable
+  apiEndpoint, validEndpoints, onHttpResponse, onHttpError
 } from '../../client/services/ads_api_service';
 
 describe('AdsAPIService', function () {
@@ -23,44 +23,49 @@ describe('AdsAPIService', function () {
       });
 
       it('should invoke resolve if the response has a valid JSON body', function () {
-        const response = {
+        const fakeHttpRequest = {
           status: 200,
           responseText: "{\"hello\": \"world\"}"
         }
 
-        onHttpResponse(resolve, reject)(response);
+        const handler = onHttpResponse(resolve, reject, fakeHttpRequest);
+        handler();
 
         expect(resolve.called && !reject.called).to.be.true;
       });
 
       it('should invoke reject if the response does not have a valid JSON body', function () {
-        const response = {
+        const fakeHttpRequest = {
           status: 200,
           responseText: "{"
         };
 
-        onHttpResponse(resolve, reject)(response);
+        const handler = onHttpResponse(resolve, reject, fakeHttpRequest);
+        handler();
 
         expect(reject.called && !resolve.called).to.be.true;
       });
 
-      it('should invoke reject if the response does not have a responseText property', function () {
-        const response = {
-          status: 200
+      it('should invoke reject if the responseText property is empty', function () {
+        const fakeHttpRequest = {
+          status: 200,
+          responseText: '',
         };
 
-        onHttpResponse(resolve, reject)(response);
+        const handler = onHttpResponse(resolve, reject, fakeHttpRequest);
+        handler();
 
         expect(reject.called && !resolve.called).to.be.true;
       });
 
       it('should invoke reject if the response status code is not 200', function () {
-        const response = {
+        const fakeHttpRequest = {
           status: 404,
           responseText: "\"There was a problem \""
         }
 
-        onHttpResponse(resolve, reject)(response);
+        const handler = onHttpResponse(resolve, reject, fakeHttpRequest);
+        handler();
 
         expect(reject.called && !resolve.called).to.be.true;
       });
@@ -82,20 +87,22 @@ describe('AdsAPIService', function () {
       });
 
       it('should invoke reject with the error', function () {
-        const error = {
+        const fakeHttpRequest = {}
+        const errorEvent = {
           message: "OH NO!!!"
         };
 
-        onHttpError(resolve, reject)(error);
+        const handler = onHttpError(resolve, reject, fakeHttpRequest);
+        handler(errorEvent);
 
-        expect(reject.calledWith(error)).to.be.true;
+        expect(reject.calledWith(errorEvent)).to.be.true;
       });
     });
   });
 
   describe('get', function () {
     it('should return a Promise', function () {
-      expect(getTestable('blah')).to.be.an.instanceof(Promise);
+      expect(AdsAPIService.get('blah', {})).to.be.an.instanceof(Promise);
     });
 
     it('should reject if an invalid endpoint is provided', function (done) {
@@ -103,7 +110,7 @@ describe('AdsAPIService', function () {
 
       expect(validEndpoints).to.not.include.keys(invalid);
 
-      getTestable(invalid)
+      AdsAPIService.get(invalid, {})
         .then(() => {
           // This shouldn't happen
           return done(new Error('Promise resolved instead of rejected'));
@@ -123,7 +130,7 @@ describe('AdsAPIService', function () {
 
       const url = apiEndpoint('/ads');
       
-      getTestable('ads', fakeHTTP);
+      AdsAPIService.get('ads', fakeHTTP);
 
       expect(fakeHTTP.open.calledWith('GET', url)).to.be.true;
       expect(fakeHTTP.send.called).to.be.true;
